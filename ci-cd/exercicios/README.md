@@ -74,7 +74,7 @@ Esta seção contém exercícios práticos para aplicar os conceitos de CI/CD us
 - Documente mudanças significativas
 
 ### Recursos Úteis
-- 📚 **[Referências para Estudo](../documentacao/referencias-estudo.md)** - Links completos para aprofundamento
+- 📚 **[Referências para Estudo](../documentacao/03-referencias-estudo.md)** - Links completos para aprofundamento
 - [Azure DevOps Documentation](https://docs.microsoft.com/azure/devops/) - Documentação oficial
 - [YAML Schema Reference](https://docs.microsoft.com/azure/devops/pipelines/yaml-schema) - Referência YAML
 - [Azure DevOps Labs](https://www.azuredevopslabs.com/) - Laboratórios práticos
