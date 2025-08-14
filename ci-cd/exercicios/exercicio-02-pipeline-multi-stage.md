@@ -1,20 +1,20 @@
-# Exercício 2: Pipeline Multi-Stage
+# 🏗️ Exercício 2: Pipeline Multi-Stage
 
-## Objetivo
+## 🎯 Objetivo
 Expandir o pipeline básico para incluir múltiplos estágios com deployment automático para ambientes de Development e Production.
 
-## Cenário
+## 📋 Cenário
 A equipe agora precisa de deployment automatizado. O pipeline deve deployar automaticamente para Development após build/test bem-sucedidos, e para Production apenas quando aprovado manualmente.
 
-## Pré-requisitos
-- Exercício 1 completado
-- Azure Subscription (conta gratuita serve)
-- Resource Group criado no Azure
-- Dois App Services criados (dev e prod)
+## ✅ Pré-requisitos
+- 🏆 Exercício 1 completado
+- ☁️ Azure Subscription (conta gratuita serve)
+- 📁 Resource Group criado no Azure
+- 📦 Dois App Services criados (dev e prod)
 
-## Parte 1: Preparação da Infraestrutura Azure
+## ☁️ Parte 1: Preparação da Infraestrutura Azure
 
-### 1.1 Criar Resource Group e App Services
+### 🏗️ 1.1 Criar Resource Group e App Services
 
 ```bash
 # Login no Azure
@@ -31,7 +31,7 @@ az webapp create --name webapp-pipeline-demo-dev --resource-group rg-pipeline-de
 az webapp create --name webapp-pipeline-demo-prod --resource-group rg-pipeline-demo --plan asp-pipeline-demo
 ```
 
-### 1.2 Configurar Service Connection no Azure DevOps
+### 🔗 1.2 Configurar Service Connection no Azure DevOps
 
 1. **Project Settings** > **Service connections**
 2. **New service connection** > **Azure Resource Manager**
@@ -39,9 +39,9 @@ az webapp create --name webapp-pipeline-demo-prod --resource-group rg-pipeline-d
 4. Selecione sua subscription e resource group
 5. Nome: `Azure-Pipeline-Demo`
 
-## Parte 2: Pipeline Multi-Stage
+## ⚙️ Parte 2: Pipeline Multi-Stage
 
-### 2.1 Atualizar azure-pipelines.yml
+### 📄 2.1 Atualizar azure-pipelines.yml
 
 Substitua o conteúdo do arquivo `azure-pipelines.yml`:
 

@@ -21,6 +21,13 @@
 ### 🏁 Pipeline Básico
 
 🔍 **Anatomia de um pipeline simples**: Vamos começar com o exemplo mais básico possível para construir uma aplicação .NET.
+
+**🧱 Estrutura do Pipeline Básico:**
+- **📍 Trigger**: Execução automática na branch `main`  
+- **🖥️ Pool**: Agent Ubuntu Linux hospedado pela Microsoft
+- **🔧 Variables**: Configuração de build em modo Release
+- **🔄 Steps**: Sequência linear de tarefas (Setup → Restore → Build → Test)
+
 ```yaml
 # azure-pipelines.yml
 trigger:
@@ -57,6 +64,13 @@ steps:
     projects: '**/*Tests.csproj'
     arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
 ```
+
+💡 **Características do Pipeline Básico:**
+- ✅ **Simples e direto**: Todas as tarefas em sequência linear
+- ✅ **Single-job**: Execução em um único agent/job
+- ✅ **Build-only**: Focado apenas na construção e testes
+- ❌ **Sem deploy**: Não inclui estágios de deployment
+- ❌ **Sem paralelização**: Steps executam sequencialmente
 
 ### 🏆 Pipeline Multi-Stage
 

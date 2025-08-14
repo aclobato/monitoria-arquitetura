@@ -1,0 +1,53 @@
+# Template para job de build completo
+parameters:
+- name: vmImage
+  type: string
+  default: 'ubuntu-latest'
+- name: buildConfiguration
+  type: string
+  default: 'Release'
+- name: dotnetVersion
+  type: string
+  default: '6.x'
+- name: projectPath
+  type: string
+  default: 'src'
+
+jobs:
+- job: Build
+  displayName: 'Build and Test'
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  
+  steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      version: ${{ parameters.dotnetVersion }}
+      performMultiLevelLookup: true
+
+  - template: ../steps/dotnet-build.yml
+    parameters:
+      buildConfiguration: ${{ parameters.buildConfiguration }}
+      projects: '${{ parameters.projectPath }}/**/*.csproj'
+
+  - template: ../steps/dotnet-test.yml
+    parameters:
+      buildConfiguration: ${{ parameters.buildConfiguration }}
+      testProjects: '${{ parameters.projectPath }}/**/*Tests.csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish application'
+    inputs:
+      command: 'publish'
+      publishWebProjects: false
+      projects: '${{ parameters.projectPath }}/**/WebApi.csproj'
+      arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)'
+      zipAfterPublish: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish build artifacts'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'

@@ -1,0 +1,33 @@
+# Template para testes .NET
+parameters:
+- name: buildConfiguration
+  type: string
+  default: 'Release'
+- name: testProjects
+  type: string
+  default: '**/*Tests.csproj'
+- name: collectCodeCoverage
+  type: boolean
+  default: true
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Run unit tests'
+  inputs:
+    command: 'test'
+    projects: ${{ parameters.testProjects }}
+    arguments: >
+      --configuration ${{ parameters.buildConfiguration }}
+      --no-build
+      --logger trx
+      ${{ if eq(parameters.collectCodeCoverage, true) }}
+      --collect "Code coverage"
+
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  inputs:
+    testResultsFormat: 'VSTest'
+    testResultsFiles: '**/*.trx'
+    mergeTestResults: true
+    failTaskOnFailedTests: true
+  condition: succeededOrFailed()

@@ -1,173 +1,59 @@
-# Exercício 1: Pipeline Básico
+# 🏗️ Exercício 1: Pipeline Básico
 
-## Objetivo
+## 🎯 Objetivo
 Criar seu primeiro pipeline CI/CD no Azure DevOps para uma aplicação .NET Web API simples.
 
-## Cenário
+## 📋 Cenário
 Você é desenvolvedor de uma equipe que precisa automatizar o processo de build e teste de uma Web API. O objetivo é criar um pipeline que execute build e testes automaticamente a cada commit na branch main.
 
-## Pré-requisitos
-- Conta no Azure DevOps
-- Projeto criado no Azure DevOps
-- Repositório Git configurado
+## ✅ Pré-requisitos
+- 🔵 Conta no Azure DevOps
+- 📁 Projeto criado no Azure DevOps
+- 🌿 Repositório Git configurado
 
-## Parte 1: Preparação do Código
+## 📦 Código Pronto
+**🎉 Boa notícia!** O código da aplicação já está pronto na pasta `codigo-exemplo/exercicio-01/`. 
 
-### 1.1 Criar Aplicação .NET Web API
+Você pode **focar 100% na criação da pipeline** sem perder tempo escrevendo código!
 
-Crie uma estrutura de projeto simples:
+## 📦 Parte 1: Preparação do Código
+
+### 📂 1.1 Copiar Código de Exemplo
+
+1. **📥 Copie** todo o conteúdo da pasta `codigo-exemplo/exercicio-01/` 
+2. **📤 Cole** na raiz do seu repositório Azure DevOps
+3. **✅ Verifique** a estrutura:
 
 ```
-src/
-├── WebApi/
-│   ├── WebApi.csproj
-│   ├── Program.cs
-│   └── Controllers/
-│       └── WeatherForecastController.cs
-└── WebApi.Tests/
-    ├── WebApi.Tests.csproj
-    └── WeatherForecastControllerTests.cs
+seu-repositorio/
+└── src/
+    ├── WebApi/              # Web API com controller
+    │   ├── WebApi.csproj
+    │   ├── Program.cs
+    │   └── Controllers/
+    │       └── WeatherForecastController.cs
+    └── WebApi.Tests/        # Testes unitários  
+        ├── WebApi.Tests.csproj
+        └── WeatherForecastControllerTests.cs
 ```
 
-### 1.2 Arquivo WebApi.csproj
-```xml
-<Project Sdk="Microsoft.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-  </ItemGroup>
-</Project>
+### 🧪 1.2 Testar Localmente (Opcional)
+
+```bash
+# Testar se o código funciona
+cd src/WebApi
+dotnet run
+
+# Em outro terminal - executar testes
+cd src/WebApi.Tests  
+dotnet test
 ```
 
-### 1.3 Arquivo Program.cs
-```csharp
-var builder = WebApplication.CreateBuilder(args);
+**🎯 Agora você pode focar totalmente na criação da pipeline!**
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+## ⚙️ Parte 2: Criação do Pipeline
 
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
-
-app.Run();
-```
-
-### 1.4 WeatherForecastController.cs
-```csharp
-using Microsoft.AspNetCore.Mvc;
-
-namespace WebApi.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class WeatherForecastController : ControllerBase
-{
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
-
-    [HttpGet]
-    public IEnumerable<WeatherForecast> Get()
-    {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = DateTime.Now.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
-    }
-}
-
-public class WeatherForecast
-{
-    public DateTime Date { get; set; }
-    public int TemperatureC { get; set; }
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-    public string? Summary { get; set; }
-}
-```
-
-### 1.5 Arquivo de Teste WebApi.Tests.csproj
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
-    <PackageReference Include="coverlet.collector" Version="3.1.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="../WebApi/WebApi.csproj" />
-  </ItemGroup>
-</Project>
-```
-
-### 1.6 WeatherForecastControllerTests.cs
-```csharp
-using WebApi.Controllers;
-using Xunit;
-
-namespace WebApi.Tests;
-
-public class WeatherForecastControllerTests
-{
-    [Fact]
-    public void Get_ReturnsWeatherForecasts()
-    {
-        // Arrange
-        var controller = new WeatherForecastController();
-
-        // Act
-        var result = controller.Get();
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(5, result.Count());
-    }
-
-    [Fact]
-    public void Get_ReturnsValidTemperatureRange()
-    {
-        // Arrange
-        var controller = new WeatherForecastController();
-
-        // Act
-        var result = controller.Get();
-
-        // Assert
-        Assert.All(result, forecast => 
-        {
-            Assert.InRange(forecast.TemperatureC, -20, 55);
-        });
-    }
-}
-```
-
-## Parte 2: Criação do Pipeline
-
-### 2.1 Criar arquivo azure-pipelines.yml
+### 📄 2.1 Criar arquivo azure-pipelines.yml
 
 Na raiz do repositório, crie o arquivo `azure-pipelines.yml`:
 
@@ -249,16 +135,16 @@ steps:
     publishLocation: 'Container'
 ```
 
-## Parte 3: Configuração no Azure DevOps
+## 🔵 Parte 3: Configuração no Azure DevOps
 
-### 3.1 Commit e Push do Código
+### 📤 3.1 Commit e Push do Código
 ```bash
 git add .
 git commit -m "Adicionar aplicação e pipeline inicial"
 git push origin main
 ```
 
-### 3.2 Configurar Pipeline no Azure DevOps
+### ⚙️ 3.2 Configurar Pipeline no Azure DevOps
 
 1. Acesse seu projeto no Azure DevOps
 2. Navegue para **Pipelines** > **Create Pipeline**
@@ -268,9 +154,9 @@ git push origin main
 6. Selecione `/azure-pipelines.yml`
 7. Clique em **Run**
 
-## Parte 4: Validação
+## ✅ Parte 4: Validação
 
-### 4.1 Critérios de Sucesso
+### 🏆 4.1 Critérios de Sucesso
 
 ✅ **Pipeline executa sem erros**
 - Build completa com sucesso
@@ -285,33 +171,33 @@ git push origin main
 - Tab "Artifacts" contém o build publicado
 - Arquivo ZIP da aplicação está disponível
 
-### 4.2 Verificações Adicionais
+### 🔍 4.2 Verificações Adicionais
 
 1. **Trigger automático**: Faça um commit e verifique se o pipeline executa automaticamente
 2. **Logs detalhados**: Examine os logs de cada step
 3. **Duração**: Pipeline deve completar em menos de 5 minutos
 
-## Parte 5: Melhorias Opcionais
+## 🚀 Parte 5: Melhorias Opcionais
 
-### 5.1 Adicionar Badge ao README
+### 🏅 5.1 Adicionar Badge ao README
 ```markdown
 [![Build Status](https://dev.azure.com/[organization]/[project]/_apis/build/status/[pipeline-name]?branchName=main)](https://dev.azure.com/[organization]/[project]/_build/latest?definitionId=[pipeline-id]&branchName=main)
 ```
 
-### 5.2 Configurar Notifications
+### 🔔 5.2 Configurar Notifications
 1. Project Settings > Notifications
 2. New subscription > Build completion
 3. Configurar email ou Teams
 
-### 5.3 Branch Policies
+### 🛡️ 5.3 Branch Policies
 1. Repos > Branches
 2. Selecionar branch main > Branch policies
 3. Habilitar "Require a minimum number of reviewers"
 4. Adicionar "Check for linked work items"
 
-## Troubleshooting
+## 🐛 Troubleshooting
 
-### Problemas Comuns
+### ⚠️ Problemas Comuns
 
 **Erro: "No test result files matching *.trx were found"**
 - Solução: Verificar se o projeto de teste está sendo executado corretamente
@@ -322,13 +208,13 @@ git push origin main
 **Pipeline não executa automaticamente**
 - Solução: Verificar trigger configuration e branch names
 
-### Debug Tips
+### 🔧 Debug Tips
 
 1. Adicionar variável `system.debug: true` para logs detalhados
 2. Usar `displayName` em todos os steps para melhor rastreabilidade
 3. Verificar permissões do service account
 
-## Resultado Esperado
+## 🎉 Resultado Esperado
 
 Ao final deste exercício, você terá:
 - ✅ Pipeline funcionando no Azure DevOps
@@ -337,7 +223,7 @@ Ao final deste exercício, você terá:
 - ✅ Artefatos publicados
 - ✅ Relatórios de teste visíveis na interface
 
-**Tempo estimado**: 30-45 minutos
+⏱️ **Tempo estimado**: 30-45 minutos
 
-## Próximo Passo
+## ➡️ Próximo Passo
 Prossiga para o **Exercício 2: Pipeline Multi-Stage** para aprender sobre deployment automatizado.

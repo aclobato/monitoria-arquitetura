@@ -1,19 +1,19 @@
-# Exercício 3: Templates e Reutilização
+# 🏗️ Exercício 3: Templates e Reutilização
 
-## Objetivo
+## 🎯 Objetivo
 Criar templates reutilizáveis para pipelines, promovendo consistência e manutenibilidade em múltiplos projetos.
 
-## Cenário
+## 📋 Cenário
 Sua empresa tem múltiplas APIs .NET e precisa padronizar os pipelines. Você deve criar templates que podem ser reutilizados por diferentes equipes, mantendo flexibilidade para customizações específicas.
 
-## Pré-requisitos
-- Exercícios 1 e 2 completados
-- Conhecimento básico de YAML
-- Múltiplos repositórios ou projetos para testar reutilização
+## ✅ Pré-requisitos
+- 🏆 Exercícios 1 e 2 completados
+- 📄 Conhecimento básico de YAML
+- 📁 Múltiplos repositórios ou projetos para testar reutilização
 
-## Parte 1: Estrutura de Templates
+## 📁 Parte 1: Estrutura de Templates
 
-### 1.1 Criar Repositório de Templates
+### 🏗️ 1.1 Criar Repositório de Templates
 
 Crie um novo repositório chamado `azure-pipeline-templates` ou pasta `templates/` no repositório atual:
 
@@ -35,7 +35,7 @@ templates/
     └── full-pipeline.yml
 ```
 
-### 1.2 README para Templates
+### 📄 1.2 README para Templates
 
 ```markdown
 # Azure Pipeline Templates
