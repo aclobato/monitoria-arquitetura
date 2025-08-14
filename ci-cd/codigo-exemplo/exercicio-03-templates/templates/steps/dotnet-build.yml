@@ -19,9 +19,17 @@ steps:
       projects: ${{ parameters.projects }}
       feedsToUse: 'select'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Build application'
-  inputs:
-    command: 'build'
-    projects: ${{ parameters.projects }}
-    arguments: '--configuration ${{ parameters.buildConfiguration }} ${{ if eq(parameters.restorePackages, true) }}--no-restore'
+- ${{ if eq(parameters.restorePackages, true) }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Build application'
+    inputs:
+      command: 'build'
+      projects: ${{ parameters.projects }}
+      arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore'
+- ${{ else }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Build application'
+    inputs:
+      command: 'build'
+      projects: ${{ parameters.projects }}
+      arguments: '--configuration ${{ parameters.buildConfiguration }}'

@@ -15,10 +15,13 @@ monitoria_arquitetura/
 │   │   ├── 01-fundamentos-cicd.md
 │   │   ├── 02-azure-pipelines-guia.md
 │   │   └── 03-referencias-estudo.md
-│   └── exercicios/          # Practical exercises
-│       ├── exercicio-01-pipeline-basico.md
-│       ├── exercicio-02-pipeline-multi-stage.md
-│       └── exercicio-03-templates.md
+│   ├── exercicios/          # Practical exercises
+│   │   ├── exercicio-01-pipeline-basico.md
+│   │   ├── exercicio-02-pipeline-multi-stage.md
+│   │   └── exercicio-03-templates.md
+│   └── codigo-exemplo/      # Ready-to-use code for exercises
+│       ├── exercicio-01/    # Basic .NET Web API
+│       └── exercicio-03-templates/ # Multiple projects + templates
 ├── microservicos/           # Microservices Architecture (planned)
 ├── design-patterns/         # Design Patterns (planned)
 ├── cloud/                   # Cloud Architecture (planned)

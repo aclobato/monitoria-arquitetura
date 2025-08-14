@@ -11,17 +11,20 @@ parameters:
   default: true
 
 steps:
-- task: DotNetCoreCLI@2
-  displayName: 'Run unit tests'
-  inputs:
-    command: 'test'
-    projects: ${{ parameters.testProjects }}
-    arguments: >
-      --configuration ${{ parameters.buildConfiguration }}
-      --no-build
-      --logger trx
-      ${{ if eq(parameters.collectCodeCoverage, true) }}
-      --collect "Code coverage"
+- ${{ if eq(parameters.collectCodeCoverage, true) }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests'
+    inputs:
+      command: 'test'
+      projects: ${{ parameters.testProjects }}
+      arguments: '--configuration ${{ parameters.buildConfiguration }} --no-build --logger trx --collect "Code coverage"'
+- ${{ else }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests'
+    inputs:
+      command: 'test'
+      projects: ${{ parameters.testProjects }}
+      arguments: '--configuration ${{ parameters.buildConfiguration }} --no-build --logger trx'
 
 - task: PublishTestResults@2
   displayName: 'Publish test results'

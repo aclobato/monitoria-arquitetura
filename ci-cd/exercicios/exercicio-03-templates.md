@@ -1,7 +1,7 @@
 # 🏗️ Exercício 3: Templates e Reutilização
 
 ## 🎯 Objetivo
-Criar templates reutilizáveis para pipelines, promovendo consistência e manutenibilidade em múltiplos projetos.
+Aprender a criar templates reutilizáveis para pipelines, promovendo consistência e manutenibilidade entre múltiplos projetos.
 
 ## 📋 Cenário
 Sua empresa tem múltiplas APIs .NET e precisa padronizar os pipelines. Você deve criar templates que podem ser reutilizados por diferentes equipes, mantendo flexibilidade para customizações específicas.
@@ -9,80 +9,58 @@ Sua empresa tem múltiplas APIs .NET e precisa padronizar os pipelines. Você de
 ## ✅ Pré-requisitos
 - 🏆 Exercícios 1 e 2 completados
 - 📄 Conhecimento básico de YAML
-- 📁 Múltiplos repositórios ou projetos para testar reutilização
+- 📁 Entendimento de parâmetros e reutilização
 
-## 📁 Parte 1: Estrutura de Templates
+## 💡 Sobre este Exercício
+**🎆 Foco no Aprendizado:** Este exercício usa templates **simulados** (como exercício 2) para ensinar conceitos de reutilização sem complexidades de infraestrutura real.
 
-### 🏗️ 1.1 Criar Repositório de Templates
+## 📦 Código Pronto
+**🎉 Boa notícia!** Os templates de exemplo já estão prontos na pasta `codigo-exemplo/exercicio-03-templates/`!
 
-Crie um novo repositório chamado `azure-pipeline-templates` ou pasta `templates/` no repositório atual:
+Você pode **focar 100% no aprendizado de templates** sem perder tempo escrevendo código.
+
+## 📁 Parte 1: Estrutura dos Templates
+
+### 📂 1.1 Copiar Templates de Exemplo
+
+1. **📥 Copie** todo o conteúdo da pasta `codigo-exemplo/exercicio-03-templates/` 
+2. **📤 Cole** na raiz do seu repositório Azure DevOps
+3. **✅ Verifique** a estrutura:
 
 ```
-templates/
-├── README.md
-├── steps/
-│   ├── dotnet-build.yml
-│   ├── dotnet-test.yml
-│   ├── dotnet-publish.yml
-│   └── azure-deploy.yml
-├── jobs/
-│   ├── build-job.yml
-│   ├── test-job.yml
-│   └── deploy-job.yml
-└── stages/
-    ├── build-stage.yml
-    ├── deploy-stage.yml
-    └── full-pipeline.yml
+seu-repositorio/
+├── templates/                  # Templates reutilizáveis
+│   ├── steps/
+│   │   ├── dotnet-build.yml   # Build .NET
+│   │   └── dotnet-test.yml    # Testes .NET
+│   └── jobs/
+│       └── build-job.yml      # Job completo
+├── projeto-a/                 # Projeto exemplo A
+│   └── src/
+│       ├── WebApi/            # Products API
+│       └── WebApi.Tests/
+└── projeto-b/                 # Projeto exemplo B (você criará)
+    └── src/
+        ├── WebApi/            # Orders API  
+        └── WebApi.Tests/
 ```
 
-### 📄 1.2 README para Templates
+### 🧠 1.2 Conceitos que Vamos Aprender
 
-```markdown
-# Azure Pipeline Templates
+- 📝 **Parameters**: Customização de templates
+- 🔄 **Reutilização**: Um template, múltiplos projetos
+- 📊 **Hierarquia**: Steps → Jobs → Stages
+- 🎯 **DRY Principle**: Don't Repeat Yourself
+- 📁 **Organização**: Estrutura clara de templates
 
-Templates reutilizáveis para pipelines Azure DevOps.
+## ⚙️ Parte 2: Entendendo os Templates
 
-## Estrutura
+### 🔍 2.1 Analisar Template de Steps
 
-- **steps/**: Templates de steps individuais
-- **jobs/**: Templates de jobs completos  
-- **stages/**: Templates de stages completos
-
-## Como Usar
-
-### Step Template
-```yaml
-steps:
-- template: templates/steps/dotnet-build.yml
-  parameters:
-    buildConfiguration: 'Release'
-```
-
-### Job Template
-```yaml
-jobs:
-- template: templates/jobs/build-job.yml
-  parameters:
-    vmImage: 'ubuntu-latest'
-    buildConfiguration: 'Release'
-```
-
-### Stage Template
-```yaml
-stages:
-- template: templates/stages/build-stage.yml
-  parameters:
-    vmImage: 'ubuntu-latest'
-    buildConfiguration: 'Release'
-```
-```
-
-## Parte 2: Step Templates
-
-### 2.1 Template: dotnet-build.yml
+Abra o arquivo `templates/steps/dotnet-build.yml` (já criado):
 
 ```yaml
-# templates/steps/dotnet-build.yml
+# Template para build .NET
 parameters:
 - name: buildConfiguration
   type: string
@@ -90,193 +68,46 @@ parameters:
 - name: projects
   type: string
   default: '**/*.csproj'
-- name: dotnetVersion
-  type: string
-  default: '6.x'
-- name: restoreProjects
-  type: string
-  default: '**/*.csproj'
-
-steps:
-- task: UseDotNet@2
-  displayName: 'Install .NET SDK ${{ parameters.dotnetVersion }}'
-  inputs:
-    version: ${{ parameters.dotnetVersion }}
-    performMultiLevelLookup: true
-
-- task: DotNetCoreCLI@2
-  displayName: 'Restore NuGet packages'
-  inputs:
-    command: 'restore'
-    projects: ${{ parameters.restoreProjects }}
-    feedsToUse: 'select'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Build ${{ parameters.buildConfiguration }}'
-  inputs:
-    command: 'build'
-    projects: ${{ parameters.projects }}
-    arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore'
-```
-
-### 2.2 Template: dotnet-test.yml
-
-```yaml
-# templates/steps/dotnet-test.yml
-parameters:
-- name: buildConfiguration
-  type: string
-  default: 'Release'
-- name: testProjects
-  type: string
-  default: '**/*Tests.csproj'
-- name: collectCoverage
+- name: restorePackages
   type: boolean
   default: true
-- name: coverageThreshold
-  type: number
-  default: 80
 
 steps:
-- task: DotNetCoreCLI@2
-  displayName: 'Run Unit Tests'
-  inputs:
-    command: 'test'
-    projects: ${{ parameters.testProjects }}
-    arguments: >-
-      --configuration ${{ parameters.buildConfiguration }}
-      --no-build
-      --logger trx
-      ${{ if parameters.collectCoverage }}:
-        --collect "Code coverage"
-        /p:CollectCoverage=true
-        /p:CoverletOutputFormat=cobertura
-        /p:CoverletOutput=$(Agent.TempDirectory)/coverage/
-
-- task: PublishTestResults@2
-  displayName: 'Publish Test Results'
-  inputs:
-    testResultsFormat: 'VSTest'
-    testResultsFiles: '**/*.trx'
-    mergeTestResults: true
-    failTaskOnFailedTests: true
-  condition: succeededOrFailed()
-
-- ${{ if parameters.collectCoverage }}:
-  - task: PublishCodeCoverageResults@1
-    displayName: 'Publish Code Coverage'
+- ${{ if eq(parameters.restorePackages, true) }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore NuGet packages'
     inputs:
-      codeCoverageTool: 'cobertura'
-      summaryFileLocation: '$(Agent.TempDirectory)/coverage/coverage.cobertura.xml'
-      failIfCoverageEmpty: true
-    condition: succeededOrFailed()
+      command: 'restore'
+      projects: ${{ parameters.projects }}
 
-  - task: PowerShell@2
-    displayName: 'Check Coverage Threshold'
+- ${{ if eq(parameters.restorePackages, true) }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Build application'
     inputs:
-      targetType: 'inline'
-      script: |
-        # Verificar se cobertura atende ao threshold
-        $threshold = ${{ parameters.coverageThreshold }}
-        Write-Host "Coverage threshold: $threshold%"
-        
-        # Aqui você adicionaria lógica para verificar cobertura
-        # Por simplicidade, vamos apenas mostrar a mensagem
-        Write-Host "✅ Coverage check completed (threshold: $threshold%)"
+      command: 'build'
+      projects: ${{ parameters.projects }}
+      arguments: '--configuration ${{ parameters.buildConfiguration }} --no-restore'
+- ${{ else }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Build application'
+    inputs:
+      command: 'build'
+      projects: ${{ parameters.projects }}
+      arguments: '--configuration ${{ parameters.buildConfiguration }}'
 ```
 
-### 2.3 Template: azure-deploy.yml
+**📚 Conceitos importantes:**
+- 📝 **Parameters**: Tornam template flexível
+- 🔧 **Default values**: Valores padrão para conveniência  
+- ⚖️ **Conditions**: Lógica condicional (${{ if }})
+- 🔄 **Template expressions**: ${{ parameters.name }}
+
+### 🔍 2.2 Analisar Template de Job
+
+Abra o arquivo `templates/jobs/build-job.yml` (já criado):
 
 ```yaml
-# templates/steps/azure-deploy.yml
-parameters:
-- name: azureServiceConnection
-  type: string
-- name: appName
-  type: string
-- name: environment
-  type: string
-  default: 'development'
-- name: slotName
-  type: string
-  default: ''
-- name: artifactName
-  type: string
-  default: 'drop'
-- name: performSmokeTest
-  type: boolean
-  default: true
-- name: smokeTestEndpoint
-  type: string
-  default: ''
-
-steps:
-- task: DownloadPipelineArtifact@2
-  displayName: 'Download Build Artifacts'
-  inputs:
-    buildType: 'current'
-    artifactName: ${{ parameters.artifactName }}
-    targetPath: '$(Pipeline.Workspace)/${{ parameters.artifactName }}'
-
-- task: AzureWebApp@1
-  displayName: 'Deploy to Azure App Service'
-  inputs:
-    azureSubscription: ${{ parameters.azureServiceConnection }}
-    appType: 'webApp'
-    appName: ${{ parameters.appName }}
-    ${{ if ne(parameters.slotName, '') }}:
-      slotName: ${{ parameters.slotName }}
-    package: '$(Pipeline.Workspace)/${{ parameters.artifactName }}/**/*.zip'
-    deploymentMethod: 'auto'
-
-- ${{ if parameters.performSmokeTest }}:
-  - task: PowerShell@2
-    displayName: 'Smoke Test - ${{ parameters.environment }}'
-    inputs:
-      targetType: 'inline'
-      script: |
-        $appName = "${{ parameters.appName }}"
-        $slotName = "${{ parameters.slotName }}"
-        $endpoint = "${{ parameters.smokeTestEndpoint }}"
-        
-        if ($slotName -ne "") {
-            $url = "https://$appName-$slotName.azurewebsites.net"
-        } else {
-            $url = "https://$appName.azurewebsites.net"
-        }
-        
-        if ($endpoint -ne "") {
-            $url = "$url/$endpoint"
-        }
-        
-        Write-Host "Testing endpoint: $url"
-        
-        $maxRetries = 5
-        $delay = 10
-        
-        for ($i = 1; $i -le $maxRetries; $i++) {
-            try {
-                $response = Invoke-RestMethod -Uri $url -Method Get -TimeoutSec 30
-                Write-Host "✅ Smoke test passed on attempt $i"
-                Write-Host "Response: $($response | ConvertTo-Json -Depth 2)"
-                break
-            } catch {
-                Write-Warning "❌ Attempt $i failed: $($_.Exception.Message)"
-                if ($i -eq $maxRetries) {
-                    Write-Error "Smoke test failed after $maxRetries attempts"
-                    exit 1
-                }
-                Start-Sleep -Seconds $delay
-            }
-        }
-```
-
-## Parte 3: Job Templates
-
-### 3.1 Template: build-job.yml
-
-```yaml
-# templates/jobs/build-job.yml
+# Template para job de build completo
 parameters:
 - name: vmImage
   type: string
@@ -284,21 +115,9 @@ parameters:
 - name: buildConfiguration
   type: string
   default: 'Release'
-- name: dotnetVersion
+- name: projectPath
   type: string
-  default: '6.x'
-- name: projects
-  type: string
-  default: '**/*.csproj'
-- name: testProjects
-  type: string
-  default: '**/*Tests.csproj'
-- name: publishProjects
-  type: string
-  default: ''
-- name: artifactName
-  type: string
-  default: 'drop'
+  default: 'src'
 
 jobs:
 - job: Build
@@ -307,537 +126,426 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
   
   steps:
-  # Build steps
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      version: '6.x'
+
   - template: ../steps/dotnet-build.yml
     parameters:
       buildConfiguration: ${{ parameters.buildConfiguration }}
-      projects: ${{ parameters.projects }}
-      dotnetVersion: ${{ parameters.dotnetVersion }}
-  
-  # Test steps
-  - template: ../steps/dotnet-test.yml
-    parameters:
-      buildConfiguration: ${{ parameters.buildConfiguration }}
-      testProjects: ${{ parameters.testProjects }}
-      collectCoverage: true
-      coverageThreshold: 80
-  
-  # Publish steps (if specified)
-  - ${{ if ne(parameters.publishProjects, '') }}:
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish Application'
-      inputs:
-        command: 'publish'
-        publishWebProjects: false
-        projects: ${{ parameters.publishProjects }}
-        arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)'
-        zipAfterPublish: true
-    
-    - task: PublishPipelineArtifact@1
-      displayName: 'Publish Pipeline Artifact'
-      inputs:
-        targetPath: '$(Build.ArtifactStagingDirectory)'
-        artifactName: ${{ parameters.artifactName }}
-        publishLocation: 'pipeline'
+      projects: '${{ parameters.projectPath }}/**/*.csproj'
+
+  # Simulação de deployment (sem recursos Azure)
+  - script: |
+      echo "🚀 Simulating deployment..."
+      echo "Project: ${{ parameters.projectPath }}"
+      echo "Configuration: ${{ parameters.buildConfiguration }}"
+      echo "✅ Deployment simulation completed!"
+    displayName: '🚀 Simulate Deployment'
 ```
 
-### 3.2 Template: deploy-job.yml
+**📚 Conceitos importantes:**
+- 🏗️ **Template composition**: Template chama outro template
+- 📂 **Relative paths**: `../steps/dotnet-build.yml`
+- 🔗 **Parameter passing**: Repassar parâmetros entre templates
+
+## 🎯 Parte 3: Usando Templates em Projeto A
+
+### 📄 3.1 Pipeline do Projeto A
+
+Crie o arquivo `projeto-a/azure-pipelines.yml`:
 
 ```yaml
-# templates/jobs/deploy-job.yml
-parameters:
-- name: vmImage
-  type: string
-  default: 'ubuntu-latest'
-- name: environment
-  type: string
-- name: azureServiceConnection
-  type: string
-- name: appName
-  type: string
-- name: artifactName
-  type: string
-  default: 'drop'
-- name: slotName
-  type: string
-  default: ''
-- name: smokeTestEndpoint
-  type: string
-  default: ''
-- name: deploymentStrategy
-  type: string
-  default: 'runOnce'
-  values:
-  - runOnce
-  - rolling
-  - canary
-
-jobs:
-- deployment: Deploy
-  displayName: 'Deploy to ${{ parameters.environment }}'
-  environment: ${{ parameters.environment }}
-  pool:
-    vmImage: ${{ parameters.vmImage }}
-  
-  strategy:
-    ${{ parameters.deploymentStrategy }}:
-      deploy:
-        steps:
-        - template: ../steps/azure-deploy.yml
-          parameters:
-            azureServiceConnection: ${{ parameters.azureServiceConnection }}
-            appName: ${{ parameters.appName }}
-            environment: ${{ parameters.environment }}
-            slotName: ${{ parameters.slotName }}
-            artifactName: ${{ parameters.artifactName }}
-            performSmokeTest: true
-            smokeTestEndpoint: ${{ parameters.smokeTestEndpoint }}
-```
-
-## Parte 4: Stage Templates
-
-### 4.1 Template: build-stage.yml
-
-```yaml
-# templates/stages/build-stage.yml
-parameters:
-- name: vmImage
-  type: string
-  default: 'ubuntu-latest'
-- name: buildConfiguration
-  type: string
-  default: 'Release'
-- name: stageName
-  type: string
-  default: 'Build'
-- name: displayName
-  type: string
-  default: 'Build and Test'
-- name: dotnetVersion
-  type: string
-  default: '6.x'
-- name: projects
-  type: string
-  default: '**/*.csproj'
-- name: testProjects
-  type: string
-  default: '**/*Tests.csproj'
-- name: publishProjects
-  type: string
-  default: ''
-- name: artifactName
-  type: string
-  default: 'drop'
-- name: dependsOn
-  type: object
-  default: []
-- name: condition
-  type: string
-  default: 'succeeded()'
-
-stages:
-- stage: ${{ parameters.stageName }}
-  displayName: ${{ parameters.displayName }}
-  ${{ if ne(length(parameters.dependsOn), 0) }}:
-    dependsOn: ${{ parameters.dependsOn }}
-  condition: ${{ parameters.condition }}
-  
-  jobs:
-  - template: ../jobs/build-job.yml
-    parameters:
-      vmImage: ${{ parameters.vmImage }}
-      buildConfiguration: ${{ parameters.buildConfiguration }}
-      dotnetVersion: ${{ parameters.dotnetVersion }}
-      projects: ${{ parameters.projects }}
-      testProjects: ${{ parameters.testProjects }}
-      publishProjects: ${{ parameters.publishProjects }}
-      artifactName: ${{ parameters.artifactName }}
-```
-
-### 4.2 Template: deploy-stage.yml
-
-```yaml
-# templates/stages/deploy-stage.yml
-parameters:
-- name: environment
-  type: string
-- name: stageName
-  type: string
-- name: displayName
-  type: string
-- name: dependsOn
-  type: object
-  default: []
-- name: condition
-  type: string
-  default: 'succeeded()'
-- name: vmImage
-  type: string
-  default: 'ubuntu-latest'
-- name: azureServiceConnection
-  type: string
-- name: appName
-  type: string
-- name: artifactName
-  type: string
-  default: 'drop'
-- name: slotName
-  type: string
-  default: ''
-- name: smokeTestEndpoint
-  type: string
-  default: ''
-- name: deploymentStrategy
-  type: string
-  default: 'runOnce'
-  values:
-  - runOnce
-  - rolling
-  - canary
-
-stages:
-- stage: ${{ parameters.stageName }}
-  displayName: ${{ parameters.displayName }}
-  ${{ if ne(length(parameters.dependsOn), 0) }}:
-    dependsOn: ${{ parameters.dependsOn }}
-  condition: ${{ parameters.condition }}
-  
-  jobs:
-  - template: ../jobs/deploy-job.yml
-    parameters:
-      vmImage: ${{ parameters.vmImage }}
-      environment: ${{ parameters.environment }}
-      azureServiceConnection: ${{ parameters.azureServiceConnection }}
-      appName: ${{ parameters.appName }}
-      artifactName: ${{ parameters.artifactName }}
-      slotName: ${{ parameters.slotName }}
-      smokeTestEndpoint: ${{ parameters.smokeTestEndpoint }}
-      deploymentStrategy: ${{ parameters.deploymentStrategy }}
-```
-
-## Parte 5: Pipeline Completo com Templates
-
-### 5.1 Novo azure-pipelines.yml usando templates
-
-```yaml
-# azure-pipelines.yml
+# Pipeline do Projeto A (Products API) usando templates
 trigger:
   branches:
     include:
     - main
   paths:
     include:
-    - src/*
+    - projeto-a/*
 
 variables:
-- name: buildConfiguration
-  value: 'Release'
-- name: azureServiceConnection
-  value: 'Azure-Pipeline-Demo'
-- name: webAppNameDev
-  value: 'webapp-pipeline-demo-dev'
-- name: webAppNameProd
-  value: 'webapp-pipeline-demo-prod'
+  buildConfiguration: 'Release'
 
 stages:
-# Build Stage
-- template: templates/stages/build-stage.yml
-  parameters:
-    stageName: 'Build'
-    displayName: 'Build and Test Application'
-    vmImage: 'ubuntu-latest'
-    buildConfiguration: $(buildConfiguration)
-    dotnetVersion: '6.x'
-    projects: 'src/**/*.csproj'
-    testProjects: 'src/**/*Tests.csproj'
-    publishProjects: 'src/WebApi/WebApi.csproj'
-    artifactName: 'WebApi'
+# Build Stage usando template
+- stage: BuildProjectA
+  displayName: '🏗️ Build Products API'
+  jobs:
+  - template: ../templates/jobs/build-job.yml
+    parameters:
+      vmImage: 'ubuntu-latest'
+      buildConfiguration: $(buildConfiguration)
+      projectPath: 'projeto-a/src'
 
-# Deploy to Development
-- template: templates/stages/deploy-stage.yml
-  parameters:
-    stageName: 'DeployDev'
-    displayName: 'Deploy to Development'
-    environment: 'development'
-    dependsOn: ['Build']
-    condition: succeeded()
-    azureServiceConnection: $(azureServiceConnection)
-    appName: $(webAppNameDev)
-    artifactName: 'WebApi'
-    smokeTestEndpoint: 'WeatherForecast'
+# Quality Stage (simulado)
+- stage: QualityProjectA
+  displayName: '🔍 Quality Check'
+  dependsOn: BuildProjectA
+  jobs:
+  - job: QualityGates
+    displayName: 'Quality Analysis'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        echo "🔍 Running quality analysis for Products API..."
+        echo "Code Coverage: 92%"
+        echo "Security Scan: ✅ No issues"
+        echo "Performance: ✅ All benchmarks passed"
+        echo "✅ Products API quality check completed!"
+      displayName: '🔍 Simulate Quality Analysis'
 
-# Deploy to Production
-- template: templates/stages/deploy-stage.yml
-  parameters:
-    stageName: 'DeployProd'
-    displayName: 'Deploy to Production'
-    environment: 'production'
-    dependsOn: ['DeployDev']
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-    azureServiceConnection: $(azureServiceConnection)
-    appName: $(webAppNameProd)
-    artifactName: 'WebApi'
-    smokeTestEndpoint: 'WeatherForecast'
+# Deploy Stage (simulado)
+- stage: DeployProjectA
+  displayName: '🚀 Deploy Products API'
+  dependsOn: QualityProjectA
+  jobs:
+  - job: DeployProducts
+    displayName: 'Deploy Products API'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        echo "🚀 Deploying Products API..."
+        echo "Environment: Development"
+        echo "URL: https://products-api-dev.company.com (simulated)"
+        echo "✅ Products API deployed successfully!"
+      displayName: '🚀 Simulate Products Deployment'
 ```
 
-### 5.2 Pipeline Simplificado para Outros Projetos
+### 🧪 3.2 Testar Pipeline do Projeto A
 
-```yaml
-# Exemplo para outro projeto - minimal-api-pipeline.yml
-trigger:
-- main
+1. **📤 Commit** o arquivo `projeto-a/azure-pipelines.yml`
+2. **🔵 Azure DevOps** → **New Pipeline** 
+3. **📂 Existing YAML file** → `projeto-a/azure-pipelines.yml`
+4. **▶️ Run** e verificar execução
 
-variables:
-- name: buildConfiguration
-  value: 'Release'
+## 🔄 Parte 4: Reutilizando em Projeto B
 
-stages:
-- template: templates/stages/build-stage.yml
-  parameters:
-    publishProjects: 'src/MinimalApi/MinimalApi.csproj'
-    artifactName: 'MinimalApi'
+### 📦 4.1 Criar Projeto B (Orders API)
 
-- template: templates/stages/deploy-stage.yml
-  parameters:
-    stageName: 'DeployToTest'
-    displayName: 'Deploy to Test Environment'
-    environment: 'test'
-    dependsOn: ['Build']
-    azureServiceConnection: 'Azure-Test-Connection'
-    appName: 'minimal-api-test'
-    artifactName: 'MinimalApi'
+Crie a estrutura do Projeto B:
+
+```bash
+# Criar estrutura do Projeto B
+mkdir -p projeto-b/src/WebApi/Controllers
+mkdir -p projeto-b/src/WebApi.Tests
 ```
 
-## Parte 6: Extends Template
+### 🛒 4.2 Orders API (Projeto B)
 
-### 6.1 Template Master: full-pipeline.yml
+**projeto-b/src/WebApi/WebApi.csproj:**
+```xml
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+</Project>
+```
 
+**projeto-b/src/WebApi/Program.cs:**
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();
+```
+
+**projeto-b/src/WebApi/Controllers/OrdersController.cs:**
+```csharp
+using Microsoft.AspNetCore.Mvc;
+
+namespace WebApi.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class OrdersController : ControllerBase
+{
+    private static readonly List<Order> Orders = new()
+    {
+        new Order { Id = 1, CustomerName = "João Silva", Total = 199.99m },
+        new Order { Id = 2, CustomerName = "Maria Santos", Total = 299.50m },
+        new Order { Id = 3, CustomerName = "Pedro Costa", Total = 89.90m }
+    };
+
+    [HttpGet]
+    public ActionResult<IEnumerable<Order>> Get()
+    {
+        return Ok(Orders);
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<Order> Get(int id)
+    {
+        var order = Orders.FirstOrDefault(o => o.Id == id);
+        if (order == null)
+            return NotFound();
+        
+        return Ok(order);
+    }
+}
+
+public class Order
+{
+    public int Id { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public decimal Total { get; set; }
+}
+```
+
+### 📄 4.3 Pipeline do Projeto B (Reutilizando Templates!)
+
+**projeto-b/azure-pipelines.yml:**
 ```yaml
-# templates/stages/full-pipeline.yml
-parameters:
-- name: buildConfiguration
-  type: string
-  default: 'Release'
-- name: dotnetVersion
-  type: string
-  default: '6.x'
-- name: vmImage
-  type: string
-  default: 'ubuntu-latest'
-- name: projects
-  type: string
-  default: '**/*.csproj'
-- name: testProjects
-  type: string
-  default: '**/*Tests.csproj'
-- name: publishProjects
-  type: string
-- name: deployments
-  type: object
-  default: []
-
+# Pipeline do Projeto B (Orders API) - REUTILIZANDO os mesmos templates!
 trigger:
   branches:
     include:
     - main
+  paths:
+    include:
+    - projeto-b/*
+
+variables:
+  buildConfiguration: 'Debug'  # Diferente do Projeto A!
 
 stages:
-# Build Stage
-- template: build-stage.yml
-  parameters:
-    buildConfiguration: ${{ parameters.buildConfiguration }}
-    dotnetVersion: ${{ parameters.dotnetVersion }}
-    vmImage: ${{ parameters.vmImage }}
-    projects: ${{ parameters.projects }}
-    testProjects: ${{ parameters.testProjects }}
-    publishProjects: ${{ parameters.publishProjects }}
-
-# Dynamic Deployment Stages
-- ${{ each deployment in parameters.deployments }}:
-  - template: deploy-stage.yml
+# Build Stage - MESMO template, parâmetros diferentes!
+- stage: BuildProjectB
+  displayName: '🛒 Build Orders API'
+  jobs:
+  - template: ../templates/jobs/build-job.yml
     parameters:
-      stageName: ${{ deployment.stageName }}
-      displayName: ${{ deployment.displayName }}
-      environment: ${{ deployment.environment }}
-      dependsOn: ${{ deployment.dependsOn }}
-      condition: ${{ deployment.condition }}
-      azureServiceConnection: ${{ deployment.azureServiceConnection }}
-      appName: ${{ deployment.appName }}
-      smokeTestEndpoint: ${{ deployment.smokeTestEndpoint }}
+      vmImage: 'windows-latest'  # VM diferente!
+      buildConfiguration: $(buildConfiguration)
+      projectPath: 'projeto-b/src'
+
+# Quality Stage customizada
+- stage: QualityProjectB
+  displayName: '🔍 Quality Check Orders'
+  dependsOn: BuildProjectB
+  jobs:
+  - job: QualityGates
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - script: |
+        echo "🔍 Running quality analysis for Orders API..."
+        echo "Code Coverage: 88%"
+        echo "Security Scan: ✅ No issues"
+        echo "Business Rules: ✅ All validations passed"
+        echo "✅ Orders API quality check completed!"
+      displayName: '🔍 Quality Analysis - Orders'
+
+# Deploy Stage customizado  
+- stage: DeployProjectB
+  displayName: '🛒 Deploy Orders API'
+  dependsOn: QualityProjectB
+  jobs:
+  - job: DeployOrders
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - script: |
+        echo "🛒 Deploying Orders API..."
+        echo "Environment: Staging"
+        echo "URL: https://orders-api-staging.company.com (simulated)"
+        echo "Database: Orders-Staging-DB"
+        echo "✅ Orders API deployed successfully!"
+      displayName: '🛒 Deploy Orders API'
 ```
 
-### 6.2 Usando Extends Template
+## ✅ Parte 5: Validação
 
-```yaml
-# azure-pipelines-extends.yml
-extends:
-  template: templates/stages/full-pipeline.yml
-  parameters:
-    buildConfiguration: 'Release'
-    dotnetVersion: '6.x'
-    publishProjects: 'src/WebApi/WebApi.csproj'
-    deployments:
-    - stageName: 'DeployDev'
-      displayName: 'Deploy to Development'
-      environment: 'development'
-      dependsOn: ['Build']
-      condition: 'succeeded()'
-      azureServiceConnection: 'Azure-Pipeline-Demo'
-      appName: 'webapp-pipeline-demo-dev'
-      smokeTestEndpoint: 'WeatherForecast'
-    - stageName: 'DeployProd'
-      displayName: 'Deploy to Production'
-      environment: 'production'
-      dependsOn: ['DeployDev']
-      condition: "and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))"
-      azureServiceConnection: 'Azure-Pipeline-Demo'
-      appName: 'webapp-pipeline-demo-prod'
-      smokeTestEndpoint: 'WeatherForecast'
-```
+### 🏆 5.1 Critérios de Sucesso
 
-## Parte 7: Validação e Testes
-
-### 7.1 Validar Templates
-
-```yaml
-# validate-templates.yml - Pipeline para testar templates
-trigger: none
-
-pool:
-  vmImage: 'ubuntu-latest'
-
-steps:
-- task: PowerShell@2
-  displayName: 'Validate YAML Templates'
-  inputs:
-    targetType: 'inline'
-    script: |
-      # Encontrar todos os arquivos YAML de template
-      $templates = Get-ChildItem -Path "templates" -Filter "*.yml" -Recurse
-      
-      foreach ($template in $templates) {
-        Write-Host "Validating template: $($template.FullName)"
-        
-        # Aqui você pode adicionar validações específicas
-        # Por exemplo, verificar se parâmetros obrigatórios existem
-        $content = Get-Content $template.FullName -Raw
-        
-        if ($content -match "parameters:") {
-          Write-Host "✅ Template has parameters section"
-        } else {
-          Write-Warning "⚠️  Template may be missing parameters section"
-        }
-        
-        if ($content -match "steps:|jobs:|stages:") {
-          Write-Host "✅ Template has valid Azure DevOps structure"
-        } else {
-          Write-Error "❌ Template missing valid structure"
-        }
-      }
-      
-      Write-Host "Template validation completed"
-```
-
-### 7.2 Testes de Integração
-
-Crie diferentes pipelines para testar os templates:
-
-```yaml
-# test-templates-pipeline.yml
-trigger: none
-
-stages:
-- template: templates/stages/build-stage.yml
-  parameters:
-    stageName: 'TestBuild'
-    displayName: 'Test Build with Templates'
-    projects: 'src/**/*.csproj'
-    testProjects: 'src/**/*Tests.csproj'
-    publishProjects: 'src/WebApi/WebApi.csproj'
-```
-
-## Parte 8: Versionamento e Distribuição
-
-### 8.1 Versionamento de Templates
-
-```yaml
-# templates/version.yml
-parameters:
-- name: templateVersion
-  type: string
-  default: '1.0.0'
-
-steps:
-- task: PowerShell@2
-  displayName: 'Template Version Info'
-  inputs:
-    script: |
-      Write-Host "Using template version: ${{ parameters.templateVersion }}"
-      Write-Host "Template last updated: $(Get-Date)"
-```
-
-### 8.2 Documentação de Mudanças
-
-```markdown
-# CHANGELOG.md
-
-## [1.2.0] - 2024-01-15
-### Added
-- Support for deployment slots in azure-deploy.yml
-- Coverage threshold parameter in dotnet-test.yml
-- Extends template for full pipeline
-
-### Changed
-- Improved error handling in smoke tests
-- Updated default .NET version to 6.x
-
-### Fixed
-- Fixed artifact download path in deploy templates
-
-## [1.1.0] - 2023-12-01
-### Added
-- Job templates for build and deploy
-- Stage templates with conditional logic
-- Support for multiple deployment strategies
-```
-
-## Parte 9: Validação Final
-
-### 9.1 Critérios de Sucesso
-
-✅ **Templates funcionam corretamente**
-- Step templates executam sem erro
-- Job templates produzem artifacts esperados
-- Stage templates deployam com sucesso
+✅ **Templates funcionam em múltiplos projetos**
+- Template usado em Projeto A e Projeto B
+- Parâmetros diferentes produzem resultados diferentes
+- Mesmo código de template, comportamentos customizados
 
 ✅ **Reutilização é efetiva**
-- Mesmo template usado em múltiplos pipelines
-- Parametrização funciona corretamente
-- Manutenção centralizada é possível
+- Não há duplicação de código YAML
+- Manutenção centralizada nos templates
+- Customização através de parâmetros
 
-✅ **Documentação está completa**
-- README explicando uso dos templates
-- Parâmetros documentados
-- Exemplos funcionais
+✅ **Flexibilidade mantida**
+- Projeto A usa Ubuntu, Projeto B usa Windows
+- Diferentes configurações (Release vs Debug)
+- Customização de steps específicos
 
-### 9.2 Teste de Reutilização
+### 🔍 5.2 Verificações Práticas
 
-1. Crie um segundo projeto/repositório
-2. Use os templates criados
-3. Customize apenas os parâmetros necessários
-4. Verifique se o pipeline funciona sem modificações nos templates
+1. **🔄 Ambos pipelines executam:** Projeto A e B funcionam
+2. **📊 Logs diferentes:** VMs e configurações diferentes aparecem nos logs
+3. **⚙️ Templates iguais:** Mesmo código de template usado por ambos
+4. **🛠️ Manutenção:** Alterar template afeta ambos os projetos
 
-## Resultado Esperado
+## 🚀 Parte 6: Melhorias Opcionais
+
+### 📄 6.1 Template com Múltiplas Tecnologias
+
+Crie `templates/jobs/multi-tech-build.yml`:
+
+```yaml
+# Template que suporta .NET e Node.js
+parameters:
+- name: technology
+  type: string
+  values:
+  - dotnet
+  - nodejs
+- name: buildConfiguration
+  type: string
+  default: 'Release'
+
+jobs:
+- job: Build
+  steps:
+  - ${{ if eq(parameters.technology, 'dotnet') }}:
+    - template: ../steps/dotnet-build.yml
+      parameters:
+        buildConfiguration: ${{ parameters.buildConfiguration }}
+  
+  - ${{ if eq(parameters.technology, 'nodejs') }}:
+    - script: |
+        echo "📦 Installing Node.js dependencies..."
+        npm install
+        echo "🏗️ Building Node.js application..."
+        npm run build
+        echo "✅ Node.js build completed!"
+      displayName: '📦 Build Node.js App'
+```
+
+### 🌍 6.2 Template com Environments Dinâmicos
+
+```yaml
+# templates/stages/deploy-multi-env.yml
+parameters:
+- name: environments
+  type: object
+- name: projectName
+  type: string
+
+stages:
+- ${{ each env in parameters.environments }}:
+  - stage: Deploy_${{ env.name }}
+    displayName: '🚀 Deploy to ${{ env.displayName }}'
+    jobs:
+    - job: Deploy
+      steps:
+      - script: |
+          echo "🚀 Deploying ${{ parameters.projectName }} to ${{ env.displayName }}..."
+          echo "URL: ${{ env.url }}"
+          echo "✅ Deployment completed!"
+        displayName: '🚀 Deploy ${{ parameters.projectName }}'
+```
+
+**Uso:**
+```yaml
+- template: templates/stages/deploy-multi-env.yml
+  parameters:
+    projectName: 'Products API'
+    environments:
+    - name: 'dev'
+      displayName: 'Development'
+      url: 'https://products-dev.company.com'
+    - name: 'prod'
+      displayName: 'Production'
+      url: 'https://products.company.com'
+```
+
+## 🐛 Troubleshooting
+
+### ⚠️ Problemas Comuns
+
+**❌ Template não encontrado:**
+- Verificar path relativo (`../templates/...`)
+- Certificar-se de que arquivo existe
+
+**❌ Parâmetro não reconhecido:**
+- Verificar sintaxe: `${{ parameters.nome }}`
+- Confirmar se parâmetro foi declarado
+
+**❌ Template não executa:**
+- Validar indentação YAML
+- Verificar se todos os parâmetros obrigatórios foram passados
+
+**❌ Erro: "The directive 'if' is not allowed in this context":**
+- ❌ **Errado**: `arguments: '--config ${{ if eq(params.x, true) }}--flag'` 
+- ✅ **Correto**: Usar `${{ if }}` como bloco completo separado:
+```yaml
+- ${{ if eq(parameters.flag, true) }}:
+  - task: Build
+    inputs:
+      arguments: '--config --flag'
+- ${{ else }}:
+  - task: Build  
+    inputs:
+      arguments: '--config'
+```
+
+### 🔧 Debug Tips
+
+1. **Echo parâmetros** para verificar valores:
+```yaml
+- script: echo "Config: ${{ parameters.buildConfiguration }}"
+```
+
+2. **Validar YAML** antes de commit
+3. **Testar templates** isoladamente
+
+## 🎉 Resultado Esperado
 
 Ao final deste exercício, você terá:
-- ✅ Sistema completo de templates reutilizáveis
-- ✅ Templates para steps, jobs e stages
-- ✅ Pipeline parametrizado e flexível
-- ✅ Documentação completa
-- ✅ Capacidade de manter pipelines de forma centralizada
-- ✅ Redução significativa de duplicação de código
+- ✅ Templates reutilizáveis funcionando
+- ✅ Dois projetos usando os mesmos templates
+- ✅ Customização através de parâmetros
+- ✅ Estrutura organizada e maintível
+- ✅ Redução de 80%+ na duplicação de código
+- ✅ Base para padronização em toda empresa
 
-**Tempo estimado**: 45-60 minutos
+⏱️ **Tempo estimado**: 45-60 minutos
 
-## Próximo Passo
-Prossiga para o **Exercício 4: Integração com Azure Key Vault** para aprender sobre gerenciamento seguro de secrets e configurações.
+## ➡️ Próximo Passo
+Prossiga para o **Exercício 4: Integração com Azure Key Vault** para aprender sobre gerenciamento seguro de secrets!
+
+## 🎯 Benefícios dos Templates
+
+**💼 Para a Empresa:**
+- 📏 Padronização de pipelines
+- 🔧 Manutenção centralizada
+- 🚀 Time-to-market reduzido para novos projetos
+
+**👨‍💻 Para Desenvolvedores:**
+- ⏱️ Menos tempo criando pipelines
+- ✅ Menos erros de configuração
+- 🎯 Foco no código de negócio
+
+**🏢 Para DevOps:**
+- 🛠️ Governança consistente
+- 📊 Padrões de qualidade enforced
+- 🔄 Evolução de práticas centralizada
