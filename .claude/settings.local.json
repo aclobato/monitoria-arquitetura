@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\dti\\\\monitoria-arquitetura\" -Recurse -Directory)",
+      "Bash(Select-Object FullName)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(Get-ChildItem -Path \"c:\\\\dti\\\\monitoria-arquitetura\" -Force)",
+      "Bash(Select-Object Name, Mode)"
+    ]
+  }
+}
