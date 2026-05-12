@@ -6,7 +6,9 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(Get-ChildItem -Path \"c:\\\\dti\\\\monitoria-arquitetura\" -Force)",
-      "Bash(Select-Object Name, Mode)"
+      "Bash(Select-Object Name, Mode)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)"
     ]
   }
 }

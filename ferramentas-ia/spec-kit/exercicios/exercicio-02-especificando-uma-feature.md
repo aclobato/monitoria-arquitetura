@@ -12,17 +12,21 @@ Usar `/speckit.specify` e `/speckit.clarify` para transformar um requisito vago 
 
 ## 📋 Cenário
 
-O time de arquitetura precisa adicionar ao repositório de monitoria um **sistema de avaliação de exercícios**: monitores precisam conseguir registrar o progresso dos desenvolvedores nos exercícios e dar feedback estruturado.
+O `MonitoriaBase` já registra a conclusão de exercícios pelos alunos, mas os **monitores não conseguem dar feedback** sobre o trabalho realizado. O time quer adicionar um **sistema de avaliação e feedback** ao serviço existente.
 
 Você receberá o requisito de forma vaga (como acontece na prática) e seu trabalho é transformá-lo em uma spec precisa usando o spec-kit.
+
+> 📂 **Projeto de referência:** `ferramentas-ia/spec-kit/codigo-exemplo/projeto-base/`  
+> Leia o `README.md` do projeto-base e o código de `MonitoriaService.cs` antes de começar — o contexto existente melhora muito a spec gerada.
 
 ---
 
 ## ✅ Pré-requisitos
 
 - [ ] Exercício 1 concluído (spec-kit instalado e Copilot integrado)
-- [ ] `.specify/memory/constitution.md` criada
-- [ ] VS Code aberto no repositório de monitoria
+- [ ] `.specify/memory/constitution.md` criada no `projeto-base/`
+- [ ] VS Code aberto na pasta `projeto-base/`
+- [ ] `dotnet test` passando no `projeto-base/`
 
 ---
 
@@ -37,7 +41,7 @@ Este é o requisito como você receberia na prática — vago e incompleto:
 ### 1.2 Criar a pasta da feature
 
 ```bash
-mkdir .specify/specs/avaliacao-exercicios
+mkdir .specify/specs/avaliacao-feedback
 ```
 
 ### 1.3 Gerar a spec com Copilot
@@ -47,13 +51,20 @@ No Copilot Chat, execute:
 ```
 /speckit.specify
 
-FEATURE: Sistema de avaliação de exercícios da monitoria
-CONTEXTO: Repositório educacional onde monitores acompanham desenvolvedores que praticam exercícios de arquitetura
-REQUISITO INICIAL: Quero conseguir registrar que um aluno fez um exercício e dar um feedback pra ele
-USUÁRIOS: Monitores (quem avalia) e Desenvolvedores (quem recebe feedback)
+FEATURE: Sistema de avaliação e feedback de exercícios
+CONTEXTO: O MonitoriaBase já permite que alunos marquem exercícios como concluídos (via
+  MonitoriaService.MarkExerciseAsCompleted). O que está faltando é a capacidade de
+  monitores darem feedback estruturado sobre essas conclusões.
+SISTEMA EXISTENTE:
+  - Student (Id, Name, Email)
+  - Exercise (Id, Title, Topic, DifficultyLevel)
+  - ExerciseAttempt (Id, StudentId, ExerciseId, CompletedAt, Status)
+  - MonitoriaService com 5 operações básicas
+REQUISITO: Quero conseguir registrar que um aluno fez um exercício e dar um feedback pra ele
+USUÁRIOS: Monitores (quem avalia) e Alunos (quem recebe feedback)
 ```
 
-Salve o resultado em `.specify/specs/avaliacao-exercicios/spec.md`.
+Salve o resultado em `.specify/specs/avaliacao-feedback/spec.md`.
 
 ---
 
@@ -73,27 +84,27 @@ Use as questões abaixo como ponto de partida (adicione as suas):
 ```
 /speckit.clarify
 
-Tenho as seguintes dúvidas sobre a spec de avaliação:
+Tenho as seguintes dúvidas sobre a spec de avaliação e feedback:
 
-1. Como um monitor registra que um aluno "fez" um exercício?
-   Só marcar como concluído ou precisa anexar evidência?
+1. O feedback é dado sobre o ExerciseAttempt existente ou cria um novo registro?
+   Ou seja, o monitor avalia o "attempt" que o aluno já criou, ou avalia separadamente?
 
-2. Qual o formato do feedback? Texto livre, notas (1-5), categorias fixas?
+2. Qual o formato do feedback? Texto livre, nota (1-5), categorias fixas (aprovado/reprovado)?
 
-3. Um aluno pode refazer um exercício já avaliado? O que acontece com o feedback anterior?
+3. Um aluno pode ter múltiplos attempts do mesmo exercício? O que acontece com feedbacks anteriores?
 
-4. Monitores podem editar feedbacks já enviados?
+4. Monitores podem editar um feedback já dado?
 
-5. Alunos são notificados quando recebem feedback? Por qual canal?
+5. A operação de feedback altera o Status do ExerciseAttempt ou cria um novo campo?
 
-6. Existe prazo para dar feedback após o exercício ser marcado como concluído?
+6. Existe rastreamento de qual monitor deu o feedback?
 ```
 
 ### 2.3 Responder as perguntas levantadas pelo Copilot
 
 O Copilot pode levantar perguntas adicionais. Responda com base no contexto da monitoria. Use seu julgamento — não existe resposta certa única aqui.
 
-Atualize o `spec.md` com as decisões tomadas.
+Atualize o `.specify/specs/avaliacao-feedback/spec.md` com as decisões tomadas.
 
 ---
 

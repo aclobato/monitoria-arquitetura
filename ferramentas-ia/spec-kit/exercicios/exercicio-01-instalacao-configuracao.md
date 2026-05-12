@@ -6,13 +6,15 @@
 
 ## 🎯 Objetivo
 
-Instalar o spec-kit, inicializar um projeto com ele e criar a `constitution.md` do projeto de monitoria, entendendo a estrutura de artefatos gerada.
+Instalar o spec-kit, inicializar o `projeto-base` com ele e criar a `constitution.md`, entendendo a estrutura de artefatos gerada.
 
 ---
 
 ## 📋 Cenário
 
-Você é o responsável por padronizar o uso do GitHub Copilot no time de arquitetura. Para isso, vai configurar o spec-kit no repositório de monitoria e definir os princípios de governança que vão guiar todas as futuras especificações do projeto.
+Você é o responsável por padronizar o uso do GitHub Copilot no time de arquitetura. Para isso, vai configurar o spec-kit no `projeto-base` — um sistema simples de gestão de monitoria em .NET — e definir os princípios de governança que vão guiar todas as futuras especificações do projeto.
+
+> 📂 **Projeto de referência:** `ferramentas-ia/spec-kit/codigo-exemplo/projeto-base/`
 
 ---
 
@@ -20,6 +22,7 @@ Você é o responsável por padronizar o uso do GitHub Copilot no time de arquit
 
 - [ ] VS Code com extensão GitHub Copilot ativa
 - [ ] Python 3.8+ instalado (`python --version`)
+- [ ] .NET 8 SDK instalado (`dotnet --version`)
 - [ ] Terminal com acesso à internet
 
 ---
@@ -59,18 +62,27 @@ Você deve ver os comandos do spec-kit listados como sugestões. Se não aparece
 
 ---
 
-## 🚀 Parte 2: Inicializando o Projeto
+## 🚀 Parte 2: Explorando e Inicializando o projeto-base
 
-### 2.1 Navegar até o repositório de monitoria
+### 2.1 Navegar até o projeto-base e verificar que funciona
 
 ```bash
-cd c:\dti\monitoria-arquitetura
+cd ferramentas-ia/spec-kit/codigo-exemplo/projeto-base
+
+# Rodar os testes para confirmar que o projeto está íntegro
+dotnet test
+# Esperado: 6 testes passando
+
+# Executar a aplicação para ver o que já está implementado
+dotnet run --project src/MonitoriaBase
 ```
+
+Leia o [README do projeto-base](../codigo-exemplo/projeto-base/README.md) para entender o que está implementado e o que os exercícios vão adicionar.
 
 ### 2.2 Inicializar o spec-kit
 
 ```bash
-specify init MONITORIA-ARQUITETURA
+specify init MONITORIA-BASE
 ```
 
 ### 2.3 Explorar a estrutura gerada
@@ -99,25 +111,26 @@ No Copilot Chat, execute:
 ```
 /speckit.constitution
 
-Projeto: Monitoria de Arquitetura de Software
-Propósito: Repositório educacional para ensinar práticas de arquitetura para desenvolvedores
-Stack: .NET 8, C#, xUnit, Azure DevOps, GitHub
-Padrões: Clean Code, SOLID, Design Patterns (GoF)
-Público: Desenvolvedores em formação, de júnior a pleno
+Projeto: MonitoriaBase — Sistema de Gestão de Monitoria
+Propósito: Sistema de gestão de alunos, exercícios e progresso de uma monitoria de arquitetura de software
+Stack: .NET 8, C#, xUnit
+Padrões: Clean Code, SOLID, injeção de dependência via construtor
 Convenções:
-- Documentação sempre em português brasileiro
-- Código em inglês (nomes de classes, métodos, variáveis)
-- Exercícios progressivos: Iniciante → Intermediário → Avançado
-- Exemplos autocontidos e executáveis
+- Código em inglês (classes, métodos, variáveis)
+- Armazenamento in-memory (sem banco de dados externo)
+- Interfaces antes de implementações
+- Testes unitários para cada operação do serviço
 ```
 
 ### 3.2 Revisar e ajustar
 
-Abra o arquivo `.specify/memory/constitution.md` gerado. Leia com atenção e responda:
+Abra o arquivo `.specify/memory/constitution.md` gerado. Compare com o código do `projeto-base` e responda:
 
-- As convenções batem com o que você vê no projeto existente?
+- As convenções estão alinhadas com o código existente (ex: nomes das classes, padrão de interface)?
 - Alguma regra importante ficou faltando?
-- Tem algo que não faz sentido para o contexto da monitoria?
+- Tem algo que o Copilot assumiu que você não concorda?
+
+> 💡 **Referência:** Veja o exemplo em `codigo-exemplo/exemplo-specify/.specify/memory/constitution.md` para comparar com um constitution bem elaborado.
 
 Edite diretamente o arquivo para ajustar o que for necessário.
 
@@ -125,7 +138,7 @@ Edite diretamente o arquivo para ajustar o que for necessário.
 
 ```bash
 git add .specify/
-git commit -m "feat: inicializar spec-kit com constitution do projeto"
+git commit -m "feat: inicializar spec-kit no projeto-base"
 ```
 
 ---

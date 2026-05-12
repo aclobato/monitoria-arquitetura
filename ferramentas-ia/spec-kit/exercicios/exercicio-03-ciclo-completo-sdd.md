@@ -12,12 +12,13 @@ Executar o ciclo completo do Spec-Driven Development — da especificação à i
 
 ## 📋 Cenário
 
-Você vai implementar, via SDD, uma extensão do **Sistema de Notificações** já usado no Exercício 3 de Design Patterns. A feature nova: **suporte a múltiplos canais com fallback automático**.
+O `MonitoriaBase` registra exercícios concluídos, mas não tem como **notificar alunos** sobre eventos do sistema (ex: novo feedback recebido, novo exercício disponível). Você vai adicionar um sistema de notificação com **fallback automático de canal** usando SDD completo.
 
-> 💡 Usar um tema já familiar permite que você foque na **metodologia** SDD, não em aprender o domínio.
+> 📂 **Projeto de referência:** `ferramentas-ia/spec-kit/codigo-exemplo/projeto-base/`  
+> Os artefatos `.specify/` de exemplo estão em `codigo-exemplo/exemplo-specify/` — use-os como referência de qualidade, mas construa os seus próprios.
 
 **Feature a implementar:**
-> Quando uma notificação falha em um canal (ex: e-mail), o sistema deve tentar automaticamente o próximo canal preferido pelo usuário, até esgotar as opções ou obter sucesso.
+> O sistema deve conseguir enviar notificações aos alunos. Cada aluno tem canais preferidos em ordem de prioridade (e-mail, SMS, push). Se o canal primário falhar, o sistema tenta automaticamente o próximo, até obter sucesso ou esgotar as opções.
 
 ---
 
@@ -25,8 +26,8 @@ Você vai implementar, via SDD, uma extensão do **Sistema de Notificações** j
 
 - [ ] Exercícios 1 e 2 concluídos
 - [ ] spec-kit instalado e Copilot integrado
-- [ ] constitution.md criada (Exercício 1)
-- [ ] Familiaridade com o Sistema de Notificações (ver `design-patterns/exercicios/exercicio-03-sistema-notificacoes.md`)
+- [ ] `constitution.md` criada no `projeto-base/` (Exercício 1)
+- [ ] `dotnet test` passando no `projeto-base/`
 
 ---
 
@@ -58,16 +59,22 @@ No Copilot Chat:
 ```
 /speckit.specify
 
-FEATURE: Fallback automático de canal de notificação
-CONTEXTO: Sistema de notificações que já suporta e-mail, SMS e push.
-  Cada usuário tem canais preferidos em ordem de prioridade.
-PROBLEMA: Quando o canal primário falha, a notificação se perde.
-SOLICITADO: O sistema deve tentar o próximo canal do usuário automaticamente
-  até obter sucesso ou esgotar as opções.
+FEATURE: Sistema de notificação de alunos com fallback automático de canal
+CONTEXTO: O MonitoriaBase (Student, Exercise, ExerciseAttempt, MonitoriaService)
+  ainda não tem mecanismo de notificação. Alunos precisam ser notificados sobre
+  eventos como novo feedback recebido ou novo exercício disponível.
+SISTEMA EXISTENTE:
+  - Student tem Id, Name, Email (apenas e-mail, sem canal de notificação configurado ainda)
+  - MonitoriaService gerencia alunos, exercícios e tentativas
+PROBLEMA: Sem notificações, alunos precisam verificar ativamente se há atualizações.
+SOLICITADO: Sistema de notificação onde cada aluno configura canais preferidos
+  (e-mail, SMS, push) em ordem de prioridade. Se o canal primário falhar, o sistema
+  tenta automaticamente o próximo até obter sucesso ou esgotar as opções.
 RESTRIÇÕES:
-  - Não pode reenviar pelo mesmo canal que já falhou
-  - Usuário deve ser informado qual canal foi usado efetivamente
-  - Tentativas devem ser registradas para auditoria
+  - Não reenviar pelo mesmo canal que já falhou nesta notificação
+  - Retornar qual canal foi usado efetivamente
+  - Registrar todas as tentativas (canal, horário, resultado)
+  - Sem dependência de serviços externos reais (usar fakes nos testes)
 ```
 
 Salve em `.specify/specs/notificacao-fallback/spec.md`.
@@ -143,7 +150,7 @@ Verifique:
 
 ### 5.1 Implementar tarefa por tarefa
 
-Para cada uma das 3 tarefas selecionadas, use:
+Lembre-se: a implementação vai dentro do `projeto-base/src/MonitoriaBase/`. Para cada uma das 3 tarefas selecionadas, use:
 
 ```
 /speckit.implement specs/notificacao-fallback/tasks.md
@@ -160,7 +167,7 @@ Implementar: [COLE AQUI O TEXTO DA TAREFA ESPECÍFICA]
 
 ### 5.2 Contexto persistente
 
-Note que o Copilot usa spec + plan como contexto em cada chamada de implement. Compare:
+O Copilot usa spec + plan como contexto em cada chamada de implement, gerando código coerente com o `MonitoriaBase` existente (nomes de namespace, padrão de interface, etc.). Compare:
 
 ```
 ❌ Sem SDD:
@@ -168,10 +175,10 @@ Note que o Copilot usa spec + plan como contexto em cada chamada de implement. C
 
 ✅ Com SDD:
 /speckit.implement tasks.md
-Tarefa: Implementar NotificationFallbackService com lógica de retry por canal
+Tarefa: Implementar INotificationChannel com integração ao MonitoriaBase
 ```
 
-O segundo gera código que respeita todas as decisões já tomadas (limites de tentativas, formato de log, etc.).
+O segundo gera código que respeita todas as decisões já tomadas (limites de tentativas, formato de log, padrão de namespace do projeto).
 
 ---
 
@@ -223,7 +230,7 @@ Peça para um colega implementar a mesma feature **sem spec-kit**, usando apenas
 
 ## 🏆 Desafio Final
 
-Refaça o fluxo do Exercício 2 (spec de avaliação de exercícios) agora executando todas as 6 fases, incluindo a implementação. Use os artefatos de exemplo em `codigo-exemplo/` como referência de como spec, plan e tasks bem elaborados se parecem.
+Implemente também a feature do Exercício 2 (avaliação e feedback) usando o ciclo completo das 6 fases. Você já tem a spec — agora gere o plan, as tasks e implemente no `projeto-base`. Use os artefatos de exemplo em `codigo-exemplo/exemplo-specify/` como referência de qualidade.
 
 ---
 
